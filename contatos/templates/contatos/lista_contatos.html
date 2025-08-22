@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Contatos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'bounce-in': 'bounceIn 0.6s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
+    <!-- Header com gradiente -->
+    <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 shadow-lg">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center animate-bounce-in">
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">
+                    <i class="fas fa-address-book mr-3"></i>
+                    Agenda de Contatos
+                </h1>
+                <p class="text-blue-100 text-lg">Gerencie seus contatos de forma simples e elegante</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container principal -->
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Botões de Ação -->
+        <div class="mb-8 animate-slide-up flex flex-col sm:flex-row gap-4">
+            <a href="{% url 'novo_contato' %}" 
+               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                <i class="fas fa-plus mr-2"></i>
+                Novo Contato
+            </a>
+            <a href="{% url 'exportar_csv' %}" 
+               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
+                <i class="fas fa-download mr-2"></i>
+                Baixar CSV
+            </a>
+        </div>
+
+        <!-- Lista de Contatos -->
+        <div class="space-y-4 animate-fade-in">
+            {% for contato in contatos %}
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
+                <div class="p-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                        <!-- Informações do contato -->
+                        <div class="flex-1 space-y-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                    {{ contato.nome|first|upper }}
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-800">{{ contato.nome }}</h3>
+                                    <div class="flex flex-col sm:flex-row sm:space-x-6 space-y-1 sm:space-y-0 text-gray-600">
+                                        <div class="flex items-center space-x-2">
+                                            <i class="fas fa-phone text-blue-500"></i>
+                                            <span>{{ contato.telefone }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <i class="fas fa-envelope text-purple-500"></i>
+                                            <span>{{ contato.email }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ações -->
+                        <div class="flex space-x-3">
+                            <a href="{% url 'editar_contato' contato.id %}" 
+                               class="inline-flex items-center px-4 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition-colors duration-200 shadow-md hover:shadow-lg">
+                                <i class="fas fa-edit mr-2"></i>
+                                Editar
+                            </a>
+                            <button type="button"
+                               class="inline-flex items-center px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors duration-200 shadow-md hover:shadow-lg"
+                               onclick="abrirModalDeletar('{{ contato.id }}')">
+                                <i class="fas fa-trash mr-2"></i>
+                                Deletar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Estado vazio -->
+            <div class="text-center py-16">
+                <div class="mb-6">
+                    <i class="fas fa-address-book text-6xl text-gray-300"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-gray-600 mb-2">Nenhum contato encontrado</h3>
+                <p class="text-gray-500 mb-6">Comece adicionando seu primeiro contato!</p>
+                <a href="{% url 'novo_contato' %}" 
+                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300">
+                    <i class="fas fa-plus mr-2"></i>
+                    Adicionar Primeiro Contato
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="mt-12 bg-white rounded-xl shadow-md p-6">
+            <div class="text-center">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Estatísticas</h3>
+                <div class="flex justify-center items-center space-x-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600">{{ contatos|length }}</div>
+                        <div class="text-gray-600">Total de Contatos</div>
+                    </div>
+                    <div class="w-px h-12 bg-gray-300"></div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-purple-600">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="text-gray-600">Feito com amor</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação de exclusão -->
+    <div id="modalDeletar" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4 animate-bounce-in">
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Confirmar Exclusão</h3>
+                <p class="text-gray-600 mb-6">Tem certeza que deseja deletar este contato? Esta ação não pode ser desfeita.</p>
+                <div class="flex space-x-4">
+                    <button id="confirmarDeletar" 
+                            class="flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200">
+                        <i class="fas fa-trash mr-2"></i>
+                        Deletar
+                    </button>
+                    <button id="cancelarDeletar" 
+                            class="flex-1 bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors duration-200">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let urlDeletar = '';
+        function abrirModalDeletar(contatoId) {
+            urlDeletar = `/deletar/${contatoId}/`;
+            const modal = document.getElementById('modalDeletar');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.animate-slide-up, .animate-fade-in');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            document.querySelectorAll('.bg-white').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Modal exclusão - listeners adicionados apenas uma vez
+            const modal = document.getElementById('modalDeletar');
+            const btnConfirmar = document.getElementById('confirmarDeletar');
+            const btnCancelar = document.getElementById('cancelarDeletar');
+            btnConfirmar.addEventListener('click', function() {
+                window.location.href = urlDeletar;
+            });
+            btnCancelar.addEventListener('click', function() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            });
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

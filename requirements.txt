@@ -1,0 +1,24 @@
+# Django Framework
+Django==4.1.7
+
+# Database
+psycopg2-binary==2.9.5
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Development tools (opcional)
+# Descomente se precisar durante desenvolvimento
+# django-debug-toolbar==4.0.0
+# black==23.1.0
+# flake8==6.0.0
+
+# Production tools (opcional)
+# Descomente para produção
+# gunicorn==20.1.0
+# whitenoise==6.4.0
+# django-cors-headers==3.14.0
+
+# Security (opcional)
+# django-extensions==3.2.1
+# django-crispy-forms==2.0
